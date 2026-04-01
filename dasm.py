@@ -5,6 +5,8 @@ import argparse
 import networkx as nx
 from networkx.readwrite import json_graph
 import json
+from utils import \
+    sanitize_filename
 
 parser = argparse.ArgumentParser(description="反汇编exe")
 parser.add_argument("-f", type=str, help="文件名")
@@ -13,11 +15,6 @@ args = parser.parse_args()
 
 infilename = args.f
 OUTPUT_DIR = os.path.join(os.path.dirname(args.f), args.o)
-
-
-def sanitize_filename(name):
-    """处理 Windows 非法文件名字符"""
-    return re.sub(r'[\\/:*?"<>|]', "_", name)
 
 
 def dump_function_cfg(func, cfg):
