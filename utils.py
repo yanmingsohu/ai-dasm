@@ -222,3 +222,9 @@ def sanitize_filename(name):
     """处理 Windows 非法文件名字符"""
     return re.sub(r'[\\/:*?"<>|]', "_", name)
 
+
+def parse_addr(asm):
+  match = re.search(r'Address:\s*(0x[0-9a-fA-F]+)', asm)
+  if match:
+      return int(match.group(1), 16)
+  return None

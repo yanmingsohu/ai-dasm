@@ -1,5 +1,15 @@
 # AI-Based Disassembly Engineering
 
+install:
+```sh
+python -m venv venv
+venv\Scripts\activate
+pip install -r requirements.txt
+```
+
+The functionality is divided into multiple scripts that execute separately.
+
+
 ## Disassembly
 
 ```sh

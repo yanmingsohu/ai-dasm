@@ -6,7 +6,8 @@ import base64
 from pathlib import Path
 from rich.console import Console
 from utils import \
-    load_and_traverse_callgraph
+    load_and_traverse_callgraph, \
+    parse_addr
 
 console = Console()
 parser = argparse.ArgumentParser(description="生成 rizin 脚本")
@@ -19,20 +20,8 @@ GRAPH_JSON = args.g
 INPUT_DIR = args.m
 SAVE_FILE = args.o
 ASM_DIR = args.a
-
-if not SAVE_FILE:
-  SAVE_FILE = GRAPH_JSON +".rizin"
-if not ASM_DIR:
-  ASM_DIR = INPUT_DIR
-
-save = open(SAVE_FILE, 'w', encoding="utf-8")
-
-
-def parse_addr(asm):
-  match = re.search(r'Address:\s*(0x[0-9a-fA-F]+)', asm)
-  if match:
-      return int(match.group(1), 16)
-  return None
+save = None
+not_found = 0
 
 
 def make_ccu_command(text: str, address: int) -> str:
@@ -45,10 +34,12 @@ def make_ccu_command(text: str, address: int) -> str:
 
 
 def process_node(node, name, c, t, deps):
+  global not_found
   mdf = Path(INPUT_DIR) / f"{name}.asm.md"
   asmf = Path(ASM_DIR) / f"{name}.asm"
   if not mdf.exists() or not asmf.exists():
     console.print(f"Error 文件不存在 {name}, {c}/{t}", style="bold red")
+    not_found += 1
     return
   
   console.print(f"正在处理 {name}, {c}/{t}  ({c/t*100:6.2f}%)")
@@ -60,9 +51,7 @@ def process_node(node, name, c, t, deps):
       cmd = make_ccu_command(comm, addr)
       save.write(cmd)
       save.write('\n')
-
   return
-
 
 
 def main():
@@ -74,9 +63,16 @@ def main():
 
 if __name__ == "__main__":
   try:
+      if not SAVE_FILE:
+        SAVE_FILE = GRAPH_JSON +".rizin"
+      if not ASM_DIR:
+        ASM_DIR = INPUT_DIR
+      save = open(SAVE_FILE, 'w', encoding="utf-8")
       main()
       console.print("All Done")
+      if not_found > 0:
+        console.print(f" - {not_found} 个文件失败", style="bold yellow")
   except KeyboardInterrupt:
       console.print("\n[yellow]程序被用户中断。[/yellow]")
-
-save.close()
+  finally:
+      save.close()

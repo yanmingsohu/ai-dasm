@@ -1,5 +1,15 @@
 # 利用 AI 进行反汇编工程
 
+安装:
+```sh
+python -m venv venv
+venv\Scripts\activate
+pip install -r requirements.txt
+```
+
+功能分成多个脚本分别执行
+
+
 ## 反汇编
 
 ```sh
