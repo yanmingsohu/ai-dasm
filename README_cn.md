@@ -28,6 +28,19 @@ python logical_analysis.py \
 该命令调用大模型对生成的函数文件进行分析并生成报告文件.
 
 
+## 生成 Cutter 注释
+
+```sh
+python gen_rizin.py \
+  -m [logical_analysis.py生成报告的目录] \
+  -a [dasm.py的输出目录, 未提供该参数则使用 -m 参数路径] \
+  -g [.callgraph.json 文件路径] \
+  -o [生成 rizin 的文件路径, 未提供则使用 -g 参数路径]
+```
+
+该命令生成一个 rizin 脚本, 在 Cutter中执行这个脚本会把分析报告作为注释合并到 Cutter 中.
+
+
 ## 生成 C 代码
 
 ```sh
