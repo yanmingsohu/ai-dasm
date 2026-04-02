@@ -31,6 +31,10 @@ def load_token(file=".token"):
     
 total_token = load_token()
 
+def save_token(file=".token"):
+  with open(file, 'w', encoding='utf8') as f:
+    f.write(str(total_token))
+
 
 def load_and_traverse_callgraph(
     json_path: str,
@@ -115,8 +119,7 @@ def extract_code(text: str, lang_hint: str = "") -> str:
 # 优雅处理 Ctrl+C
 def signal_handler(sig, frame):
     console.print("\n[yellow]用户中断 (Ctrl+C)，正在退出...[/yellow]")
-    with open('.token', 'w', encoding='utf8') as f:
-      f.write(str(total_token))
+    save_token()
     sys.exit(0)
 
 signal.signal(signal.SIGINT, signal_handler)
@@ -197,6 +200,8 @@ def chat_with_stream(
     except Exception as exc:
         console.print(f"[red]请求失败：{exc}[/red]")
         return False, "", ""
+    finally:
+        save_token()
 
 
 def stream_generate_cpp(asm_content: str, func_name: str, error_feedback: str = None, cpp_code = None):

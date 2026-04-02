@@ -4,3 +4,4 @@ venv
 fish-speech
 
 __pycache__
+.token
