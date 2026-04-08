@@ -5,3 +5,4 @@ fish-speech
 
 __pycache__
 .token
+*.egg-info

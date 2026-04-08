@@ -56,8 +56,11 @@ def process_node(node, name, c, t, deps):
     
     with open(asm_file, "r", encoding="utf-8") as f:
         messages.append({"role": "user", "content": f";函数名: {name} 汇编代码:\n{f.read()}"})
-    with open(Path(ASM_DIR) / f"{name}.asm.c", "r", encoding="utf-8") as f:
-        messages.append({"role": "user", "content": f"//函数名: {name} 反汇编c代码:\n{f.read()}"})
+        
+    cc_file = Path(ASM_DIR) / f"{name}.asm.c"
+    if cc_file.exists():
+      with open(cc_file, "r", encoding="utf-8") as f:
+          messages.append({"role": "user", "content": f"//函数名: {name} 反汇编c代码:\n{f.read()}"})
         
     for dname in deps:
       if dname != name:
