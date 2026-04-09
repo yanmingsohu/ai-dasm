@@ -20,6 +20,7 @@ from collections import defaultdict
 from typing import Callable
 
 console = Console()
+serr = Console(file=sys.stderr)
 
 
 def load_token(file=".token"):
@@ -173,7 +174,7 @@ def chat_with_stream(
 
         with Live(
             build_display(),
-            console=console,
+            console=serr,
             refresh_per_second=5,
             transient=True,     # ← 完成后自动清除
         ) as live:

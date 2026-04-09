@@ -14,30 +14,36 @@ from rich.text import Text
 from rich import box
 from collections import Counter
 
-parser = argparse.ArgumentParser(description="反汇编 asm")
-parser.add_argument("-a", type=str, help="asm 输入目录", default="asm_output")
-parser.add_argument("-o", type=str, help="cpp 输出目录", default="cpp_output")
-parser.add_argument("-api", type=str, help="OpenAI URL", default="http://127.0.0.1:7001/v1")
-parser.add_argument("-key", type=str, help="Api Key", default="sk-no-key-required")
-parser.add_argument("-model", type=str, help="Model Name", default="llama-3.1-8b-instruct")
-parser.add_argument("-sys", type=str, help="system prompt", default="source_system_prompt.txt")
-args = parser.parse_args()
-
 # ========================== 配置区 ==========================
-ASM_DIR = args.a
-OUTPUT_DIR = args.o
+ASM_DIR = "asm_output"
+OUTPUT_DIR = "cpp_output"
 MAX_RETRIES = 5
 
-BASE_URL = args.api
-API_KEY = args.key
-MODEL_NAME = args.model
+BASE_URL = "http://127.0.0.1:7001/v1"
+API_KEY = "sk-no-key-required"
+MODEL_NAME = "llama"
 
 client = OpenAI(base_url=BASE_URL, api_key=API_KEY)
 console = Console()
-
 # ===========================================================
 
-os.makedirs(OUTPUT_DIR, exist_ok=True)
+
+def src_parse_args():
+  global ASM_DIR, OUTPUT_DIR, BASE_URL, API_KEY, MODEL_NAME
+  parser = argparse.ArgumentParser(description="反汇编 asm")
+  parser.add_argument("-a", type=str, help="asm 输入目录", default="asm_output")
+  parser.add_argument("-o", type=str, help="cpp 输出目录", default="cpp_output")
+  parser.add_argument("-api", type=str, help="OpenAI URL", default="http://127.0.0.1:7001/v1")
+  parser.add_argument("-key", type=str, help="Api Key", default="sk-no-key-required")
+  parser.add_argument("-model", type=str, help="Model Name", default="llama-3.1-8b-instruct")
+  parser.add_argument("-sys", type=str, help="system prompt", default="source_system_prompt.txt")
+  args = parser.parse_args()
+  ASM_DIR = args.a
+  OUTPUT_DIR = args.o
+  BASE_URL = args.api
+  API_KEY = args.key
+  MODEL_NAME = args.model
+  os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 
 def repetition_score(tokens, n=3):
@@ -289,6 +295,7 @@ def process_single_asm(asm_path: Path):
 
 
 def main():
+    src_parse_args()
     asm_files = sorted(Path(ASM_DIR).glob("*.asm"))
     if not asm_files:
         console.print("[red]未找到任何 .asm 文件！[/red]")

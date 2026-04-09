@@ -10,20 +10,9 @@ from .utils import \
     parse_addr
 
 console = Console()
-parser = argparse.ArgumentParser(description="生成 rizin 脚本")
-parser.add_argument("-m", type=str, help="md 输入目录", default="asm_output")
-parser.add_argument("-a", type=str, help="asm 输入目录")
-parser.add_argument("-g", type=str, help="graph json file", default="callgraph.json")
-parser.add_argument("-o", type=str, help="save rizin file name")
-args = parser.parse_args()
-
-GRAPH_JSON = args.g
-INPUT_DIR = args.m
-SAVE_FILE = args.o
-ASM_DIR = args.a
 save = None
-not_found = 0
-
+INPUT_DIR = None
+ASM_DIR = None
 
 def make_ccu_command(text: str, address: int) -> str:
     """
@@ -55,7 +44,28 @@ def process_node(node, name, c, t, deps):
   return
 
 
-def main():
+def main():  
+  global INPUT_DIR, ASM_DIR, save
+  parser = argparse.ArgumentParser(description="生成 rizin 脚本")
+  parser.add_argument("-m", type=str, help="md 输入目录", default="asm_output")
+  parser.add_argument("-a", type=str, help="asm 输入目录")
+  parser.add_argument("-g", type=str, help="graph json file", default="callgraph.json")
+  parser.add_argument("-o", type=str, help="save rizin file name")
+  args = parser.parse_args()
+
+  GRAPH_JSON = args.g
+  INPUT_DIR = args.m
+  SAVE_FILE = args.o
+  ASM_DIR = args.a
+  not_found = 0
+  
+  if not SAVE_FILE:
+    SAVE_FILE = GRAPH_JSON +".rizin"
+  if not ASM_DIR:
+    ASM_DIR = INPUT_DIR
+    
+  save = open(SAVE_FILE, 'w', encoding="utf-8")
+  
   if os.path.isfile(GRAPH_JSON):
     load_and_traverse_callgraph(GRAPH_JSON, process_node)
   else:
@@ -64,16 +74,11 @@ def main():
 
 if __name__ == "__main__":
   try:
-      if not SAVE_FILE:
-        SAVE_FILE = GRAPH_JSON +".rizin"
-      if not ASM_DIR:
-        ASM_DIR = INPUT_DIR
-      save = open(SAVE_FILE, 'w', encoding="utf-8")
-      main()
-      console.print("All Done")
-      if not_found > 0:
-        console.print(f" - {not_found} 个文件失败", style="bold yellow")
+    main()
+    console.print("All Done")
+    if not_found > 0:
+      console.print(f" - {not_found} 个文件失败", style="bold yellow")
   except KeyboardInterrupt:
-      console.print("\n[yellow]程序被用户中断。[/yellow]")
+    console.print("\n[yellow]程序被用户中断。[/yellow]")
   finally:
-      save.close()
+    save.close()

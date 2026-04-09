@@ -1,5 +1,4 @@
-﻿import angr
-import os
+﻿import os
 import re
 import argparse
 import networkx as nx
@@ -88,6 +87,7 @@ def call_graph(infilename, cfg):
 
 
 def main(binary_path):
+    import angr
     parser = argparse.ArgumentParser(description="反汇编exe")
     parser.add_argument("-f", type=str, help="文件名")
     parser.add_argument("-o", type=str, default="asm_output", help="输出目录")
