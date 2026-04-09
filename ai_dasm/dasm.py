@@ -5,16 +5,8 @@ import argparse
 import networkx as nx
 from networkx.readwrite import json_graph
 import json
-from utils import \
+from .utils import \
     sanitize_filename
-
-parser = argparse.ArgumentParser(description="反汇编exe")
-parser.add_argument("-f", type=str, help="文件名")
-parser.add_argument("-o", type=str, default="asm_output", help="输出目录")
-args = parser.parse_args()
-
-infilename = args.f
-OUTPUT_DIR = os.path.join(os.path.dirname(args.f), args.o)
 
 
 def dump_function_cfg(func, cfg):
@@ -75,7 +67,7 @@ def decompile_to_c(fname, func, cfg, proj):
     return hasCode, "".join(out)
     
     
-def call_graph(cfg):
+def call_graph(infilename, cfg):
     named_cg = nx.MultiDiGraph()
     cg = cfg.kb.functions.callgraph
     
@@ -96,6 +88,13 @@ def call_graph(cfg):
 
 
 def main(binary_path):
+    parser = argparse.ArgumentParser(description="反汇编exe")
+    parser.add_argument("-f", type=str, help="文件名")
+    parser.add_argument("-o", type=str, default="asm_output", help="输出目录")
+    args = parser.parse_args()
+
+    infilename = args.f
+    OUTPUT_DIR = os.path.join(os.path.dirname(args.f), args.o)
     os.makedirs(OUTPUT_DIR, exist_ok=True)
 
     print("正在加载二进制文件并生成 CFG（可能需要一些时间）...")
@@ -109,7 +108,7 @@ def main(binary_path):
         show_progressbar=True)
 
     print(f"共发现 {len(cfg.kb.functions)} 个函数，开始导出...")
-    call_graph(cfg)
+    call_graph(infilename, cfg)
     
     for func_addr, func in cfg.kb.functions.items():
         func_name = func.name or f"sub_{func_addr:x}"

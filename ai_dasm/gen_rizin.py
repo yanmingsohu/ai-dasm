@@ -5,7 +5,7 @@ import re
 import base64
 from pathlib import Path
 from rich.console import Console
-from utils import \
+from .utils import \
     load_and_traverse_callgraph, \
     parse_addr
 
@@ -16,6 +16,7 @@ parser.add_argument("-a", type=str, help="asm 输入目录")
 parser.add_argument("-g", type=str, help="graph json file", default="callgraph.json")
 parser.add_argument("-o", type=str, help="save rizin file name")
 args = parser.parse_args()
+
 GRAPH_JSON = args.g
 INPUT_DIR = args.m
 SAVE_FILE = args.o

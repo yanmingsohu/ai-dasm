@@ -7,7 +7,7 @@ from rich.live import Live
 from rich.panel import Panel
 from rich.text import Text
 import json
-from utils import \
+from ai_dasm import \
     load_and_traverse_callgraph, \
     chat_with_stream
 
