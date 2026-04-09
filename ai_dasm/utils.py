@@ -20,7 +20,6 @@ from collections import defaultdict
 from typing import Callable
 
 console = Console()
-serr = Console(file=sys.stderr)
 
 
 def load_token(file=".token"):
@@ -171,6 +170,7 @@ def chat_with_stream(
             messages=messages,
             stream=True,
         )
+        serr = Console(file=sys.stderr)
 
         with Live(
             build_display(),
@@ -234,3 +234,43 @@ def parse_addr(asm):
   if match:
       return int(match.group(1), 16)
   return None
+  
+  
+class Messages(list):
+    def __init__(self, name, syspf, url, cache_dir="comment_cache", key="none key", iterable=None):
+        if iterable is None:
+            iterable = []
+        super().__init__(iterable)
+        with open(syspf, "r", encoding="utf-8") as f:
+            self.append({"role": "system", "content": f.read()})
+        self.path = Path(cache_dir) / f"{name}.txt"
+        self.url = url
+        self.key = key
+        self.cache_dir = cache_dir
+        os.makedirs(cache_dir, exist_ok=True)
+
+    def add(self, content, role='user'):
+        self.append({ 'role': role, 'content': content })
+    
+    def call_ai(self, msg = ""):
+        succ, think, resp = chat_with_stream(self.url, self.key, self);
+        if not succ:
+            err("="*80)
+            rprint(self)
+            err("="*80)
+            err("执行失败, 以上是上下文")
+            return None
+        with open(self.path, 'w', encoding='utf-8') as f:
+            f.write(msg)
+            f.write(resp)
+        return resp
+
+    def get_cache(self, _name = None):
+        if _name:
+            p = Path(self.cache_dir) / f"{_name}.txt"
+        else:
+            p = self.path
+        if not p.exists():
+            return None
+        with open(p, 'r', encoding='utf-8') as f:
+            return f.read()
